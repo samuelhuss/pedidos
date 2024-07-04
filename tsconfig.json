@@ -22,7 +22,9 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@radix-ui/react-scroll-area": ["node_modules/@radix-ui/react-scroll-area"],
+      "@radix-ui/react-tabs": ["node_modules/@radix-ui/react-tabs"]
     }
   },
   "include": ["src"],
