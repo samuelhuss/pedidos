@@ -22,7 +22,7 @@ const OrderList: React.FC<OrderListProps> = ({ orders, deleteOrder }) => {
           <Card key={index} className="w-full">
             <CardHeader>
               <CardTitle>Pedido {order.orderNumber}</CardTitle>
-              <CardDescription>{order.customerName}</CardDescription>
+              <CardDescription className="text-2xl">{order.customerName}</CardDescription>
             </CardHeader>
             {deleteOrder && (
               <CardFooter>

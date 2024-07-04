@@ -12,7 +12,7 @@ export const DisplayOrders: React.FC = () => {
       setOrders(JSON.parse(savedOrders));
     }
 
-    const ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket("ws://192.168.15.14:8080");
     ws.onmessage = async (event: MessageEvent) => {
       try {
         const message = await (event.data instanceof Blob
