@@ -4,7 +4,6 @@ import { Order } from "@/types";
 import OrderList from "@/components/ui/OrderList";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 
 export const SendOrder: React.FC = () => {
