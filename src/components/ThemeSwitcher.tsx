@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from './ui/DropdownMenu';
 
+
 export function ThemeSwitcher() {
   const { setTheme } = useTheme();
 
