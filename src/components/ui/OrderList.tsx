@@ -1,14 +1,22 @@
-import * as React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Order } from '@/types';
+import * as React from "react";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { Order } from "@/types";
+import { Button } from "./Button";
 
 interface OrderListProps {
   orders: Order[];
+  deleteOrder?: (orderNumber: string) => void;
 }
 
-const OrderList: React.FC<OrderListProps> = ({ orders }) => {
+const OrderList: React.FC<OrderListProps> = ({ orders, deleteOrder }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {orders.length > 0 ? (
         orders.map((order, index) => (
           <Card key={index} className="w-full">
@@ -16,14 +24,27 @@ const OrderList: React.FC<OrderListProps> = ({ orders }) => {
               <CardTitle>Pedido {order.orderNumber}</CardTitle>
               <CardDescription>{order.customerName}</CardDescription>
             </CardHeader>
+            {deleteOrder && (
+              <CardFooter>
+                <Button
+                  variant="destructive"
+                  onClick={() => deleteOrder(order.orderNumber)}
+                >
+                  Excluir
+                </Button>
+              </CardFooter>
+            )}
           </Card>
         ))
       ) : (
-        <Card className="w-full">
-          <CardContent>
-            <p className="text-center">Nenhum pedido pronto.</p>
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center w-full h-full">
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>Sem pedidos prontos</CardTitle>
+              <CardDescription>Espere alguns minutos</CardDescription>
+            </CardHeader>
+          </Card>
+        </div>
       )}
     </div>
   );

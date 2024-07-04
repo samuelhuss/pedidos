@@ -31,13 +31,13 @@ export const OrderForm: React.FC<OrderFormProps> = ({ sendOrder }) => {
   };
 
   return (
-    <Card className="w-[350px]">
+    <Card >
       <form onSubmit={handleSubmit}>
         <CardHeader>
           <CardTitle>Enviar Pedido</CardTitle>
           <CardDescription>Envie o pedido para o display.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="orderNumber">Número do Pedido</Label>
