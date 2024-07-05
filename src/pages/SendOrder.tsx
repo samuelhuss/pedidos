@@ -5,7 +5,6 @@ import OrderList from "@/components/ui/OrderList";
 import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import io, { Socket } from "socket.io-client";
 
 export const SendOrder: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>(() => {
@@ -13,68 +12,63 @@ export const SendOrder: React.FC = () => {
     return storedOrders ? JSON.parse(storedOrders) : [];
   });
   const [connectionStatus, setConnectionStatus] = useState("disconnected");
-  const socket = useRef<Socket | null>(null);
+  const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    socket.current = io(
-      process.env.NODE_ENV === 'production'
-        ? `wss://${window.location.host}`
-        : 'http://localhost:8080'
-    );
+    const connectWebSocket = () => {
+      ws.current = new WebSocket("ws://192.168.15.14:8080");
+      
+      ws.current.onopen = () => {
+        setConnectionStatus("connected");
+        toast("Conectado ao servidor WebSocket", {
+          description: "Você está online.",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+      };
 
-    socket.current.on('connect', () => {
-      setConnectionStatus("connected");
-      toast("Conectado ao servidor Socket.IO", {
-        description: "Você está online.",
-        action: {
-          label: "Fechar",
-          onClick: () => console.log("Fechar"),
-        },
-      });
-    });
-
-    socket.current.on('message', (message: any) => {
-      if (message.action === "delete") {
-        setOrders((prevOrders) =>
-          prevOrders.filter(
-            (order) => order.orderNumber !== message.orderNumber
-          )
-        );
-      }
-    });
-
-    socket.current.on('disconnect', () => {
-      setConnectionStatus("disconnected");
-      toast("Desconectado do servidor Socket.IO", {
-        description: "Tentando reconectar...",
-        action: {
-          label: "Fechar",
-          onClick: () => console.log("Fechar"),
-        },
-      });
-      setTimeout(() => {
-        if (socket.current) {
-          socket.current.connect();
+      ws.current.onmessage = (event: MessageEvent) => {
+        const message = JSON.parse(event.data);
+        if (message.action === "delete") {
+          setOrders((prevOrders) =>
+            prevOrders.filter(
+              (order) => order.orderNumber !== message.orderNumber
+            )
+          );
         }
-      }, 10000);
-    });
+      };
 
-    socket.current.on('error', (error) => {
-      setConnectionStatus("error");
-      console.error("Erro na conexão Socket.IO:", error);
-      toast("Erro na conexão Socket.IO", {
-        description: "Verifique sua conexão.",
-        action: {
-          label: "Fechar",
-          onClick: () => console.log("Fechar"),
-        },
-      });
-    });
+      ws.current.onclose = () => {
+        setConnectionStatus("disconnected");
+        toast("Desconectado do servidor WebSocket", {
+          description: "Tentando reconectar...",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+        setTimeout(connectWebSocket, 10000);
+      };
+
+      ws.current.onerror = (error) => {
+        setConnectionStatus("error");
+        console.error("Erro no WebSocket:", error);
+        toast("Erro na conexão WebSocket", {
+          description: "Verifique sua conexão.",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+      };
+    };
+
+    connectWebSocket();
 
     return () => {
-      if (socket.current) {
-        socket.current.disconnect();
-      }
+      ws.current?.close();
     };
   }, []);
 
@@ -83,9 +77,9 @@ export const SendOrder: React.FC = () => {
   }, [orders]);
 
   const sendOrder = (order: Order) => {
-    if (socket.current?.connected) {
+    if (ws.current?.readyState === WebSocket.OPEN) {
       order.timestamp = new Date().toISOString();
-      socket.current.emit('message', JSON.stringify(order));
+      ws.current.send(JSON.stringify(order));
       setOrders((prevOrders) => [...prevOrders, order]);
       toast("Pedido enviado com sucesso", {
         description: "Pedido já está no telão",
@@ -106,8 +100,8 @@ export const SendOrder: React.FC = () => {
   };
 
   const deleteOrder = (orderNumber: string) => {
-    if (socket.current?.connected) {
-      socket.current.emit('message', JSON.stringify({ action: "delete", orderNumber }));
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ action: "delete", orderNumber }));
       setOrders((prevOrders) =>
         prevOrders.filter((order) => order.orderNumber !== orderNumber)
       );
