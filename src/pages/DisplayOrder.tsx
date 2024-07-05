@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import OrderList from "@/components/ui/OrderList";
 import { Order } from "@/types";
 import { toast } from "sonner";
+import { io, Socket } from "socket.io-client";
 
 export const DisplayOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -13,23 +14,24 @@ export const DisplayOrders: React.FC = () => {
       setOrders(JSON.parse(savedOrders));
     }
 
-    const ws = new WebSocket("ws://192.168.15.14:8080");
+    const socket: Socket = io(
+      process.env.NODE_ENV === 'production'
+        ? `wss://${window.location.host}`
+        : 'ws://localhost:8080'
+    );
 
-    ws.onopen = () => {
-      toast("Conectado ao servidor WebSocket", {
+    socket.on('connect', () => {
+      toast("Conectado ao servidor Socket.IO", {
         description: "A conexão foi estabelecida com sucesso.",
         action: {
           label: "Fechar",
           onClick: () => console.log("Fechar"),
         },
       });
-    };
+    });
 
-    ws.onmessage = async (event: MessageEvent) => {
+    socket.on('message', (message) => {
       try {
-        const message = await (event.data instanceof Blob
-          ? event.data.text()
-          : event.data);
         const parsedMessage = JSON.parse(message);
 
         if (parsedMessage.action === "delete") {
@@ -56,34 +58,34 @@ export const DisplayOrders: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error("Erro ao processar mensagem WebSocket:", error);
+        console.error("Erro ao processar mensagem Socket.IO:", error);
       }
-    };
+    });
 
-    ws.onerror = (error) => {
-      console.error("Erro na conexão WebSocket:", error);
-      toast("Erro na conexão WebSocket", {
+    socket.on('error', (error) => {
+      console.error("Erro na conexão Socket.IO:", error);
+      toast("Erro na conexão Socket.IO", {
         description: "Falha na conexão com o servidor.",
         action: {
           label: "Fechar",
           onClick: () => console.log("Fechar"),
         },
       });
-    };
+    });
 
-    ws.onclose = () => {
-      console.log("Conexão WebSocket fechada.");
-      toast("Conexão WebSocket fechada", {
+    socket.on('disconnect', () => {
+      console.log("Conexão Socket.IO fechada.");
+      toast("Conexão Socket.IO fechada", {
         description: "A conexão com o servidor foi encerrada.",
         action: {
           label: "Fechar",
           onClick: () => console.log("Fechar"),
         },
       });
-    };
+    });
 
     return () => {
-      ws.close();
+      socket.close();
     };
   }, []);
 
