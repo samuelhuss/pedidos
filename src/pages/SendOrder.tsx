@@ -11,21 +11,61 @@ export const SendOrder: React.FC = () => {
     const storedOrders = localStorage.getItem("orders");
     return storedOrders ? JSON.parse(storedOrders) : [];
   });
+  const [connectionStatus, setConnectionStatus] = useState("disconnected");
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://192.168.15.14:8080");
+    const connectWebSocket = () => {
+      ws.current = new WebSocket("ws://192.168.15.14:8080");
+      
+      ws.current.onopen = () => {
+        setConnectionStatus("connected");
+        toast("Conectado ao servidor WebSocket", {
+          description: "Você está online.",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+      };
 
-    ws.current.onmessage = (event: MessageEvent) => {
-      const message = JSON.parse(event.data);
-      if (message.action === "delete") {
-        setOrders((prevOrders) =>
-          prevOrders.filter(
-            (order) => order.orderNumber !== message.orderNumber
-          )
-        );
-      }
+      ws.current.onmessage = (event: MessageEvent) => {
+        const message = JSON.parse(event.data);
+        if (message.action === "delete") {
+          setOrders((prevOrders) =>
+            prevOrders.filter(
+              (order) => order.orderNumber !== message.orderNumber
+            )
+          );
+        }
+      };
+
+      ws.current.onclose = () => {
+        setConnectionStatus("disconnected");
+        toast("Desconectado do servidor WebSocket", {
+          description: "Tentando reconectar...",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+        setTimeout(connectWebSocket, 10000);
+      };
+
+      ws.current.onerror = (error) => {
+        setConnectionStatus("error");
+        console.error("Erro no WebSocket:", error);
+        toast("Erro na conexão WebSocket", {
+          description: "Verifique sua conexão.",
+          action: {
+            label: "Fechar",
+            onClick: () => console.log("Fechar"),
+          },
+        });
+      };
     };
+
+    connectWebSocket();
 
     return () => {
       ws.current?.close();
@@ -38,6 +78,7 @@ export const SendOrder: React.FC = () => {
 
   const sendOrder = (order: Order) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
+      order.timestamp = new Date().toISOString();
       ws.current.send(JSON.stringify(order));
       setOrders((prevOrders) => [...prevOrders, order]);
       toast("Pedido enviado com sucesso", {
@@ -84,7 +125,21 @@ export const SendOrder: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <Tabs defaultValue="form" className="w-[380px]">
+      <div className="mb-4 flex items-center">
+        <span
+          className={`w-2.5 h-2.5 rounded-full ${
+            connectionStatus === "connected" ? "bg-green-500" :
+            connectionStatus === "disconnected" ? "bg-red-500" :
+            connectionStatus === "error" ? "bg-orange-500" : ""
+          }`}
+        ></span>
+        <span className="ml-2">
+          {connectionStatus === "connected" && "Conectado"}
+          {connectionStatus === "disconnected" && "Desconectado"}
+          {connectionStatus === "error" && "Erro na conexão"}
+        </span>
+      </div>
+      <Tabs defaultValue="form" className="w-[380px] p-4">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="form">Formulário</TabsTrigger>
           <TabsTrigger value="orders">Pedidos</TabsTrigger>
@@ -93,10 +148,9 @@ export const SendOrder: React.FC = () => {
           <OrderForm sendOrder={sendOrder} />
         </TabsContent>
         <TabsContent value="orders" className="pt-2">
-        <ScrollArea className="h-[450px] rounded-md border p-4">
+          <ScrollArea className="h-80 rounded-md border p-4">
             <OrderList orders={orders} deleteOrder={deleteOrder} />
           </ScrollArea>
-
         </TabsContent>
       </Tabs>
     </div>

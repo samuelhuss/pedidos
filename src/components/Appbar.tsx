@@ -1,9 +1,13 @@
-
 import { ThemeSwitcher } from './ThemeSwitcher';
 
 export function Appbar() {
   return (
-    <div className="fixed right-4 top-4 flex items-center gap-4">
+    <div className="fixed p-2 right-4 top-4 left-4 flex items-center justify-between">
+      <img
+        src="CA.svg"
+        alt="Icon"
+        className="h-16 "
+      />
       <ThemeSwitcher />
     </div>
   );

@@ -22,7 +22,12 @@ const OrderList: React.FC<OrderListProps> = ({ orders, deleteOrder }) => {
           <Card key={index} className="w-full">
             <CardHeader>
               <CardTitle>Pedido {order.orderNumber}</CardTitle>
-              <CardDescription className="text-2xl">{order.customerName}</CardDescription>
+              <CardDescription className="text-2xl">
+                {order.customerName}
+              </CardDescription>
+              <CardDescription className="text-sm">
+                Horário: {order.timestamp ? new Date(order.timestamp).toLocaleString() : ""}
+              </CardDescription>
             </CardHeader>
             {deleteOrder && (
               <CardFooter>

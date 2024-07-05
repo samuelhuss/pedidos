@@ -24,14 +24,15 @@ export const OrderForm: React.FC<OrderFormProps> = ({ sendOrder }) => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (orderNumber && customerName) {
-      sendOrder({ orderNumber, customerName });
+      const timestamp = new Date().toISOString();
+      sendOrder({ orderNumber, customerName, timestamp });
       setOrderNumber("");
       setCustomerName("");
     }
   };
 
   return (
-    <Card >
+    <Card>
       <form onSubmit={handleSubmit}>
         <CardHeader>
           <CardTitle>Enviar Pedido</CardTitle>

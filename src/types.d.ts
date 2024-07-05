@@ -1,6 +1,6 @@
 // types.ts
 export interface Order {
-    orderNumber: string;
-    customerName: string;
+  orderNumber: string;
+  customerName: string;
+  timestamp?: string;
   }
-  
