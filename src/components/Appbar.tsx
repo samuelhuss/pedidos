@@ -8,7 +8,10 @@ export function Appbar() {
         alt="Icon"
         className="h-16 "
       />
+      <div>
       <ThemeSwitcher />
+      </div>
+      
     </div>
   );
 }

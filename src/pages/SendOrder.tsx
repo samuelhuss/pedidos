@@ -16,8 +16,8 @@ export const SendOrder: React.FC = () => {
 
   useEffect(() => {
     const connectWebSocket = () => {
-      ws.current = new WebSocket("ws://192.168.15.14:8080");
-      
+      ws.current = new WebSocket("ws://192.168.15.10:8080"); 
+
       ws.current.onopen = () => {
         setConnectionStatus("connected");
         toast("Conectado ao servidor WebSocket", {
@@ -128,9 +128,13 @@ export const SendOrder: React.FC = () => {
       <div className="mb-4 flex items-center">
         <span
           className={`w-2.5 h-2.5 rounded-full ${
-            connectionStatus === "connected" ? "bg-green-500" :
-            connectionStatus === "disconnected" ? "bg-red-500" :
-            connectionStatus === "error" ? "bg-orange-500" : ""
+            connectionStatus === "connected"
+              ? "bg-green-500"
+              : connectionStatus === "disconnected"
+              ? "bg-red-500"
+              : connectionStatus === "error"
+              ? "bg-orange-500"
+              : ""
           }`}
         ></span>
         <span className="ml-2">

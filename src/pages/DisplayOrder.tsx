@@ -13,7 +13,7 @@ export const DisplayOrders: React.FC = () => {
       setOrders(JSON.parse(savedOrders));
     }
 
-    const ws = new WebSocket("ws://192.168.15.14:8080");
+    const ws = new WebSocket("ws://192.168.15.10:8080");
 
     ws.onopen = () => {
       toast("Conectado ao servidor WebSocket", {
