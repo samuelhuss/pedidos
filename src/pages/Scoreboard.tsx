@@ -1,7 +1,6 @@
-"use client";
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, FC } from "react";
 import { motion } from "framer-motion";
+
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import {
@@ -12,9 +11,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/Dialog";
 import { Settings, Play, Pause, RotateCcw, Plus, Minus } from "lucide-react";
+interface AnimatedScoreProps {
+  score: number;
+  color: string;
+}
 
-// Componente animado para os números do placar
-const AnimatedScore = ({ score, color  }) => {
+const AnimatedScore: FC<AnimatedScoreProps> = ({ score, color }) => {
   return (
     <motion.div
       key={score}
@@ -27,36 +29,46 @@ const AnimatedScore = ({ score, color  }) => {
       }}
       className="text-[200px] md:text-[280px] lg:text-[320px] font-bold text-black leading-none tracking-tighter"
       style={{ color }} // Define a cor dinamicamente
-
     >
       {score}
     </motion.div>
   );
 };
 
-export function Scoreboard() {
-  const [teamA, setTeamA] = useState({
+
+interface Team {
+  name: string;
+  score: number;
+}
+
+interface TimerInput {
+  minutes: number;
+  seconds: number;
+}
+
+export const Scoreboard: FC = () => {
+  const [teamA, setTeamA] = useState<Team>({
     name: "Sharks",
-    score: 0,
+    score: 300,
   });
 
-  const [teamB, setTeamB] = useState({
+  const [teamB, setTeamB] = useState<Team>({
     name: "Panthers",
-    score: 0,
+    score: 300,
   });
 
-  const [time, setTime] = useState(600);
-  const [isRunning, setIsRunning] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [time, setTime] = useState<number>(600);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const [timerInput, setTimerInput] = useState({
+  const [timerInput, setTimerInput] = useState<TimerInput>({
     minutes: Math.floor(time / 60),
     seconds: time % 60,
   });
 
-  const timerRef = useRef(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const formatTime = (timeInSeconds) => {
+  const formatTime = (timeInSeconds: number): string => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${seconds
@@ -71,7 +83,7 @@ export function Scoreboard() {
       timerRef.current = setInterval(() => {
         setTime((prevTime) => {
           if (prevTime <= 1) {
-            clearInterval(timerRef.current);
+            clearInterval(timerRef.current!);
             setIsRunning(false);
             return 0;
           }
@@ -82,12 +94,16 @@ export function Scoreboard() {
   };
 
   const pauseTimer = () => {
-    clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     setIsRunning(false);
   };
 
   const resetTimer = () => {
-    clearInterval(timerRef.current);
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     setIsRunning(false);
     setTime(600);
     setTimerInput({
@@ -119,10 +135,10 @@ export function Scoreboard() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <div className="w-full max-w-7xl bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+      <div className="w-full max-w-7xl bg-black rounded-xl shadow-md overflow-hidden border border-gray-200">
         {/* Header */}
         <div className="p-4 text-center border-b border-gray-200">
-          <h1 className="text-2xl md:text-3xl font-bold text-black">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">
             RESILIENCE
           </h1>
         </div>
@@ -131,7 +147,7 @@ export function Scoreboard() {
         <div className="flex flex-col md:flex-row">
           {/* Team A */}
           <div className="flex-1 p-6 text-center border-b md:border-b-0 md:border-r border-gray-200">
-            <h2 className="text-xl md:text-2xl font-medium text-blue-600 mb-2">
+            <h2 className="text-xl md:text-2xl font-medium text-white mb-2">
               {teamA.name}
             </h2>
             <AnimatedScore score={teamA.score} color="#2d69ef" />
@@ -139,7 +155,7 @@ export function Scoreboard() {
 
           {/* Center Timer Section */}
           <div className="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-200">
-            <div className="text-4xl md:text-5xl font-mono font-bold text-black mb-4">
+            <div className="text-4xl md:text-5xl font-mono font-bold text-white mb-4">
               {formatTime(time)}
             </div>
 
@@ -147,28 +163,28 @@ export function Scoreboard() {
             <div className="flex space-x-2 mb-4">
               {!isRunning ? (
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="icon"
                   onClick={startTimer}
-                  className="border-gray-300 hover:bg-gray-100 text-black"
+                  className="border-gray-300 hover:bg-gray-100 text-white"
                 >
                   <Play className="h-5 w-5" />
                 </Button>
               ) : (
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="icon"
                   onClick={pauseTimer}
-                  className="border-gray-300 hover:bg-gray-100 text-black"
+                  className="border-gray-300 hover:bg-gray-100 text-white"
                 >
                   <Pause className="h-5 w-5" />
                 </Button>
               )}
               <Button
-                variant="outline"
+                variant="default"
                 size="icon"
                 onClick={resetTimer}
-                className="border-gray-300 hover:bg-gray-100 text-black"
+                className="border-gray-300 hover:bg-gray-100 text-white"
               >
                 <RotateCcw className="h-5 w-5" />
               </Button>
@@ -178,9 +194,9 @@ export function Scoreboard() {
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
-                  className="border-gray-300 hover:bg-gray-100 text-black"
+                  className="border-gray-300 hover:bg-gray-100 text-white"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
@@ -338,7 +354,7 @@ export function Scoreboard() {
 
           {/* Team B */}
           <div className="flex-1 p-6 text-center">
-            <h2 className="text-xl md:text-2xl font-medium text-purple-600 mb-2">
+            <h2 className="text-xl md:text-2xl font-medium text-white mb-2">
               {teamB.name}
             </h2>
             <AnimatedScore score={teamB.score} color="#9333ea" />
