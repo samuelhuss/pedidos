@@ -49,12 +49,12 @@ interface TimerInput {
 export const Scoreboard: FC = () => {
   const [teamA, setTeamA] = useState<Team>({
     name: "Sharks",
-    score: 300,
+    score: 0,
   });
 
   const [teamB, setTeamB] = useState<Team>({
     name: "Panthers",
-    score: 300,
+    score: 0,
   });
 
   const [time, setTime] = useState<number>(600);
@@ -134,8 +134,8 @@ export const Scoreboard: FC = () => {
   }, [time]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white p-4">
-      <div className="w-full max-w-7xl bg-black rounded-xl shadow-md overflow-hidden border border-gray-200">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
+      <div className="w-full max-w-full bg-black rounded-xl shadow-md overflow-hidden border border-gray-200">
         {/* Header */}
         <div className="p-4 text-center border-b border-gray-200">
           <h1 className="text-2xl md:text-3xl font-bold text-white">
@@ -285,7 +285,7 @@ export const Scoreboard: FC = () => {
                           onClick={() =>
                             setTeamA({
                               ...teamA,
-                              score: Math.max(0, teamA.score - 1),
+                              score: Math.max(0, teamA.score - 50),
                             })
                           }
                           className="border-gray-300"
@@ -297,7 +297,7 @@ export const Scoreboard: FC = () => {
                           variant="outline"
                           size="icon"
                           onClick={() =>
-                            setTeamA({ ...teamA, score: teamA.score + 1 })
+                            setTeamA({ ...teamA, score: teamA.score + 50 })
                           }
                           className="border-gray-300"
                         >
@@ -318,7 +318,7 @@ export const Scoreboard: FC = () => {
                           onClick={() =>
                             setTeamB({
                               ...teamB,
-                              score: Math.max(0, teamB.score - 1),
+                              score: Math.max(0, teamB.score - 50),
                             })
                           }
                           className="border-gray-300"
@@ -330,7 +330,7 @@ export const Scoreboard: FC = () => {
                           variant="outline"
                           size="icon"
                           onClick={() =>
-                            setTeamB({ ...teamB, score: teamB.score + 1 })
+                            setTeamB({ ...teamB, score: teamB.score + 50 })
                           }
                           className="border-gray-300"
                         >
