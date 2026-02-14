@@ -107,8 +107,8 @@ export const Scoreboard: FC = () => {
     setIsRunning(false);
     setTime(600);
     setTimerInput({
-      minutes: 10,
-      seconds: 0,
+      minutes: 1,
+      seconds: 30,
     });
   };
 
@@ -139,7 +139,7 @@ export const Scoreboard: FC = () => {
         {/* Header */}
         <div className="p-4 text-center border-b border-gray-200">
           <h1 className="text-2xl md:text-3xl font-bold text-white">
-            RESILIENCE
+            OVERFLOW
           </h1>
         </div>
 
